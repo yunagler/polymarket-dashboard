@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket Live Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep: #07090E;
+  --bg-primary: #0C0F18;
+  --bg-card: #111622;
+  --bg-card-hover: #161D2E;
+  --bg-elevated: #1A2235;
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --text-primary: #E8ECF4;
+  --text-secondary: #7B8BA5;
+  --text-muted: #4A5568;
+  --accent-cyan: #00D4AA;
+  --accent-cyan-dim: rgba(0,212,170,0.15);
+  --accent-cyan-glow: rgba(0,212,170,0.3);
+  --green: #00E676;
+  --green-dim: rgba(0,230,118,0.12);
+  --green-mid: rgba(0,230,118,0.25);
+  --red: #FF5252;
+  --red-dim: rgba(255,82,82,0.12);
+  --red-mid: rgba(255,82,82,0.25);
+  --yellow: #FFD740;
+  --yellow-dim: rgba(255,215,64,0.12);
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+html { font-size: 15px; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Ambient glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -40%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(0,212,170,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; }
+
+/* ═══ HEADER ═══ */
+.header {
+  padding: 2rem 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(0,212,170,0.03) 0%, transparent 100%);
+  position: relative;
+}
+
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-left { flex: 1; min-width: 300px; }
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-eyebrow .pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.header h1 {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  font-weight: 300;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.refresh-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.refresh-ring {
+  width: 28px;
+  height: 28px;
+  position: relative;
+}
+
+.refresh-ring svg {
+  width: 28px;
+  height: 28px;
+  transform: rotate(-90deg);
+}
+
+.refresh-ring circle {
+  fill: none;
+  stroke-width: 2;
+}
+
+.refresh-ring .track { stroke: var(--border-subtle); }
+
+.refresh-ring .progress {
+  stroke: var(--accent-cyan);
+  stroke-dasharray: 75.4;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+  stroke-linecap: round;
+}
+
+.last-updated {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+/* ═══ STATS BAR ═══ */
+.stats-bar {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stat-item {
+  flex: 1;
+  padding: 0 1.5rem;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stat-item:first-child { padding-left: 0; }
+.stat-item:last-child { border-right: none; padding-right: 0; }
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.stat-value.accent { color: var(--accent-cyan); }
+
+/* ═══ CONTROLS ═══ */
+.controls {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px var(--accent-cyan-dim);
+}
+
+.search-box input::placeholder { color: var(--text-muted); }
+
+.search-box .search-icon {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.sort-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.sort-btn {
+  padding: 0.55rem 0.9rem;
+  background: var(--bg-card);
+  border: none;
+  border-right: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.sort-btn:last-child { border-right: none; }
+
+.sort-btn:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+
+.sort-btn.active {
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
+}
+
+.market-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ═══ GRID ═══ */
+.markets-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.2rem 2.5rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* ═══ CARD ═══ */
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  position: relative;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: cardIn 0.5s ease forwards;
+}
+
+.market-card:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,212,170,0.05);
+}
+
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+  display: flex;
+  gap: 0.8rem;
+  padding: 1rem 1rem 0.8rem;
+  align-items: flex-start;
+}
+
+.card-image {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.card-image.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Probability section */
+.card-probability {
+  padding: 0 1rem 0.8rem;
+}
+
+.prob-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.prob-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.prob-label.yes { color: var(--green); }
+.prob-label.no { color: var(--red); }
+
+.prob-label .pct {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.prob-bar {
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  background: var(--red-dim);
+  position: relative;
+}
+
+.prob-bar-yes {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green) 0%, rgba(0,230,118,0.7) 100%);
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  box-shadow: 0 0 8px var(--green-dim);
+}
+
+.prob-bar-yes::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  border-radius: 1px;
+  opacity: 0.6;
+}
+
+/* Metrics */
+.card-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.metric {
+  padding: 0.6rem 0.8rem;
+  border-right: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.metric:last-child { border-right: none; }
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Card link arrow */
+.card-link-arrow {
+  position: absolute;
+  top: 1rem;
+  right: 0.8rem;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.market-card:hover .card-link-arrow {
+  opacity: 1;
+  background: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
+}
+
+/* ═══ MULTI-OUTCOME ═══ */
+.card-outcomes {
+  padding: 0 1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.outcome-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.outcome-name {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.outcome-bar-wrap {
+  flex: 1.5;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.outcome-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.outcome-pct {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  min-width: 38px;
+  text-align: right;
+}
+
+/* ═══ LOADING ═══ */
+.loading-state {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Skeleton cards */
+.skeleton-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.2rem 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ═══ ERROR ═══ */
+.error-state {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.error-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.error-msg {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.retry-btn {
+  padding: 0.6rem 1.5rem;
+  background: var(--accent-cyan-dim);
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--radius-sm);
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover {
+  background: var(--accent-cyan-glow);
+  box-shadow: 0 0 16px var(--accent-cyan-dim);
+}
+
+/* ═══ EMPTY ═══ */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 1100px) {
+  .markets-grid, .skeleton-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .header { padding: 1.5rem 1.2rem 1rem; }
+  .header h1 { font-size: 1.8rem; }
+  .stats-bar { padding: 1rem 1.2rem; flex-wrap: wrap; gap: 0.8rem; }
+  .stat-item { border-right: none; padding: 0; min-width: 45%; }
+  .controls { padding: 1rem 1.2rem; }
+  .search-box { min-width: 100%; max-width: 100%; }
+  .sort-group { flex-wrap: wrap; }
+  .markets-grid, .skeleton-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem 1.2rem 2rem;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-eyebrow">
+          <span class="pulse"></span>
+          <span>Live Data Feed</span>
+        </div>
+        <h1>Polymarket Dashboard</h1>
+        <p class="header-subtitle">Real-time prediction market intelligence</p>
+      </div>
+      <div class="header-right">
+        <div class="refresh-indicator">
+          <div class="refresh-ring">
+            <svg viewBox="0 0 28 28">
+              <circle class="track" cx="14" cy="14" r="12"/>
+              <circle class="progress" id="refreshProgress" cx="14" cy="14" r="12"/>
+            </svg>
+          </div>
+          <span id="refreshCountdown">30s</span>
+        </div>
+        <div class="last-updated" id="lastUpdated">--:--:--</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Markets</span>
+      <span class="stat-value accent" id="statMarkets">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">24h Volume</span>
+      <span class="stat-value" id="statVolume24h">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Total Volume</span>
+      <span class="stat-value" id="statTotalVolume">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Avg Spread</span>
+      <span class="stat-value" id="statSpread">—</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-box">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" id="searchInput" placeholder="Search markets..." />
+    </div>
+    <div class="sort-group">
+      <button class="sort-btn active" data-sort="volume24hr">24h Vol</button>
+      <button class="sort-btn" data-sort="volume">Total Vol</button>
+      <button class="sort-btn" data-sort="liquidity">Liquidity</button>
+      <button class="sort-btn" data-sort="yesHigh">Highest Yes%</button>
+      <button class="sort-btn" data-sort="yesLow">Lowest Yes%</button>
+    </div>
+    <span class="market-count" id="marketCount"></span>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+    <div class="loading-state" id="loadingState">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Fetching market data...</div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = 'https://gamma-api.polymarket.com';
+const REFRESH_INTERVAL = 30;
+
+let allEvents = [];
+let currentSort = 'volume24hr';
+let searchQuery = '';
+let refreshTimer = null;
+let countdown = REFRESH_INTERVAL;
+
+// ─── Formatting ───
+function formatUSD(num) {
+  if (num == null || isNaN(num)) return '$0';
+  num = Number(num);
+  if (num >= 1e9) return '$' + (num / 1e9).toFixed(1) + 'B';
+  if (num >= 1e6) return '$' + (num / 1e6).toFixed(1) + 'M';
+  if (num >= 1e3) return '$' + (num / 1e3).toFixed(1) + 'K';
+  return '$' + num.toFixed(0);
+}
+
+function formatPct(num) {
+  if (num == null || isNaN(num)) return '0%';
+  return (Number(num) * 100).toFixed(1) + '%';
+}
+
+function timeNow() {
+  return new Date().toLocaleTimeString('en-US', { hour12: false });
+}
+
+// ─── Outcome colors ───
+const OUTCOME_COLORS = [
+  '#00E676', '#448AFF', '#FF9100', '#E040FB',
+  '#FFD740', '#18FFFF', '#FF5252', '#69F0AE',
+  '#7C4DFF', '#FF6E40'
+];
+
+function getOutcomeColor(index) {
+  return OUTCOME_COLORS[index % OUTCOME_COLORS.length];
+}
+
+// ─── Fetch Data ───
+async function fetchMarkets() {
+  const url = `${API_BASE}/events?active=true&closed=false&order=volume_24hr&ascending=false&limit=30`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+  const data = await resp.json();
+  return data;
+}
+
+// ─── Parse Event ───
+function parseEvent(event) {
+  const markets = event.markets || [];
+  const isMulti = markets.length > 1;
+
+  let yesPrice = 0, noPrice = 0;
+  let outcomes = [];
+
+  if (isMulti) {
+    outcomes = markets.map((m, i) => {
+      let prices = [];
+      try { prices = JSON.parse(m.outcomePrices || '[]'); } catch(e) {}
+      const p = prices[0] ? Number(prices[0]) : 0;
+      return {
+        name: m.groupItemTitle || m.question || `Outcome ${i+1}`,
+        price: p,
+        color: getOutcomeColor(i),
+      };
+    }).sort((a, b) => b.price - a.price);
+    yesPrice = outcomes[0]?.price || 0;
+    noPrice = 1 - yesPrice;
+  } else if (markets.length === 1) {
+    let prices = [];
+    try { prices = JSON.parse(markets[0].outcomePrices || '[]'); } catch(e) {}
+    yesPrice = prices[0] ? Number(prices[0]) : 0;
+    noPrice = prices[1] ? Number(prices[1]) : 1 - yesPrice;
+  }
+
+  return {
+    id: event.id,
+    title: event.title,
+    slug: event.slug,
+    image: event.image || (markets[0] && markets[0].image) || null,
+    volume: Number(event.volume || 0),
+    volume24hr: Number(event.volume24hr || 0),
+    liquidity: Number(event.liquidity || 0),
+    yesPrice,
+    noPrice,
+    isMulti,
+    outcomes,
+    markets,
+  };
+}
+
+// ─── Sort & Filter ───
+function getFiltered() {
+  let items = allEvents.map(parseEvent);
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    items = items.filter(e => e.title.toLowerCase().includes(q));
+  }
+
+  items.sort((a, b) => {
+    switch (currentSort) {
+      case 'volume24hr': return b.volume24hr - a.volume24hr;
+      case 'volume': return b.volume - a.volume;
+      case 'liquidity': return b.liquidity - a.liquidity;
+      case 'yesHigh': return b.yesPrice - a.yesPrice;
+      case 'yesLow': return a.yesPrice - b.yesPrice;
+      default: return 0;
+    }
+  });
+
+  return items;
+}
+
+// ─── Render ───
+function renderCard(event, index) {
+  const delay = index * 50;
+
+  let probSection = '';
+  if (event.isMulti && event.outcomes.length > 0) {
+    const topOutcomes = event.outcomes.slice(0, 4);
+    probSection = `<div class="card-outcomes">
+      ${topOutcomes.map((o, i) => `
+        <div class="outcome-row">
+          <span class="outcome-name">${escHtml(o.name)}</span>
+          <div class="outcome-bar-wrap">
+            <div class="outcome-bar-fill" style="width:${(o.price*100).toFixed(1)}%;background:${o.color};box-shadow:0 0 6px ${o.color}33"></div>
+          </div>
+          <span class="outcome-pct" style="color:${o.color}">${formatPct(o.price)}</span>
+        </div>
+      `).join('')}
+      ${event.outcomes.length > 4 ? `<div class="outcome-row"><span class="outcome-name" style="color:var(--text-muted);font-style:italic">+${event.outcomes.length - 4} more outcomes</span></div>` : ''}
+    </div>`;
+  } else {
+    probSection = `<div class="card-probability">
+      <div class="prob-labels">
+        <span class="prob-label yes">Yes <span class="pct">${formatPct(event.yesPrice)}</span></span>
+        <span class="prob-label no"><span class="pct">${formatPct(event.noPrice)}</span> No</span>
+      </div>
+      <div class="prob-bar">
+        <div class="prob-bar-yes" style="width:${(event.yesPrice*100).toFixed(1)}%"></div>
+      </div>
+    </div>`;
+  }
+
+  const imgHtml = event.image
+    ? `<img class="card-image" src="${escHtml(event.image)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\\'card-image placeholder\\'>&#x25C8;</div>'">`
+    : `<div class="card-image placeholder">&#x25C8;</div>`;
+
+  return `<a class="market-card" href="https://polymarket.com/event/${escHtml(event.slug)}" target="_blank" rel="noopener" style="animation-delay:${delay}ms;text-decoration:none;color:inherit">
+    <span class="card-link-arrow">&#x2197;</span>
+    <div class="card-header">
+      ${imgHtml}
+      <div class="card-title">${escHtml(event.title)}</div>
+    </div>
+    ${probSection}
+    <div class="card-metrics">
+      <div class="metric">
+        <div class="metric-label">24h Vol</div>
+        <div class="metric-value">${formatUSD(event.volume24hr)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Volume</div>
+        <div class="metric-value">${formatUSD(event.volume)}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Liquidity</div>
+        <div class="metric-value">${formatUSD(event.liquidity)}</div>
+      </div>
+    </div>
+  </a>`;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderAll() {
+  const items = getFiltered();
+  const contentEl = document.getElementById('content');
+
+  // Stats
+  document.getElementById('statMarkets').textContent = items.length;
+  const vol24 = items.reduce((s, e) => s + e.volume24hr, 0);
+  const volTotal = items.reduce((s, e) => s + e.volume, 0);
+  document.getElementById('statVolume24h').textContent = formatUSD(vol24);
+  document.getElementById('statTotalVolume').textContent = formatUSD(volTotal);
+
+  const spreads = items.filter(e => !e.isMulti).map(e => Math.abs(e.yesPrice - e.noPrice));
+  const avgSpread = spreads.length > 0 ? spreads.reduce((a,b) => a+b, 0) / spreads.length : 0;
+  document.getElementById('statSpread').textContent = formatPct(avgSpread);
+
+  document.getElementById('marketCount').textContent = `${items.length} market${items.length !== 1 ? 's' : ''}`;
+
+  if (items.length === 0) {
+    contentEl.innerHTML = `<div class="markets-grid"><div class="empty-state">No markets match your search.</div></div>`;
+    return;
+  }
+
+  contentEl.innerHTML = `<div class="markets-grid">${items.map((e, i) => renderCard(e, i)).join('')}</div>`;
+}
+
+function showError(msg) {
+  document.getElementById('content').innerHTML = `
+    <div class="error-state">
+      <div class="error-icon">&#x26A0;</div>
+      <div class="error-title">Connection failed</div>
+      <div class="error-msg">${escHtml(msg)}</div>
+      <button class="retry-btn" onclick="loadData()">Retry</button>
+    </div>`;
+}
+
+// ─── Data Loading ───
+async function loadData() {
+  try {
+    if (allEvents.length === 0) {
+      document.getElementById('content').innerHTML = `
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Fetching market data...</div>
+        </div>
+        <div class="skeleton-grid">
+          <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+          <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+        </div>`;
+    }
+
+    allEvents = await fetchMarkets();
+    renderAll();
+    document.getElementById('lastUpdated').textContent = timeNow();
+  } catch (err) {
+    console.error('Fetch error:', err);
+    if (allEvents.length === 0) {
+      showError(err.message);
+    }
+  }
+}
+
+// ─── Refresh Timer ───
+function startRefreshCycle() {
+  countdown = REFRESH_INTERVAL;
+  const progressCircle = document.getElementById('refreshProgress');
+  const circumference = 2 * Math.PI * 12; // r=12
+
+  if (refreshTimer) clearInterval(refreshTimer);
+
+  refreshTimer = setInterval(() => {
+    countdown--;
+    document.getElementById('refreshCountdown').textContent = countdown + 's';
+    const offset = circumference * (1 - countdown / REFRESH_INTERVAL);
+    progressCircle.style.strokeDashoffset = offset;
+
+    if (countdown <= 0) {
+      loadData();
+      countdown = REFRESH_INTERVAL;
+    }
+  }, 1000);
+}
+
+// ─── Event Listeners ───
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  renderAll();
+});
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSort = btn.dataset.sort;
+    renderAll();
+  });
+});
+
+// ─── Init ───
+loadData().then(() => startRefreshCycle());
+</script>
+</body>
+</html>
