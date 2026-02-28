@@ -627,45 +627,10 @@ body::after {
 <div id="modalRoot"></div>
 
 <script>
-const GAMMA = 'https://gamma-api.polymarket.com';
-const CLOB = 'https://clob.polymarket.com';
-const REFRESH_INTERVAL = 30;
+const REFRESH_INTERVAL = 60;
 
-// Smart proxy: detect if we're on Vercel (has /api/proxy) or need a fallback
-const IS_VERCEL = location.hostname.includes('vercel.app') || location.pathname.startsWith('/api');
-const PROXY_BASE = '/api/proxy?url=';
-const CORSPROXY = 'https://corsproxy.io/?url=';
-
-// Proxy-aware fetch: try direct first, then Vercel proxy, then corsproxy
-async function proxyFetch(url) {
-  // 1. Try direct fetch (works if CORS is enabled or same-origin)
-  try {
-    const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    if (r.ok) return r;
-  } catch {}
-
-  // 2. Try our own Vercel proxy
-  if (IS_VERCEL) {
-    try {
-      const r = await fetch(PROXY_BASE + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
-      if (r.ok) return r;
-    } catch {}
-  }
-
-  // 3. Try corsproxy.io (works from browser, blocks server-side)
-  try {
-    const r = await fetch(CORSPROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
-    if (r.ok) return r;
-  } catch {}
-
-  // 4. Last resort: try with /api/proxy even if not detected as Vercel
-  try {
-    const r = await fetch(PROXY_BASE + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
-    if (r.ok) return r;
-  } catch {}
-
-  throw new Error('All fetch methods failed for: ' + url.substring(0, 60));
-}
+// Data is served as static JSON from the same origin (updated by GitHub Actions every 5 min)
+const DATA_BASE = './data';
 
 let allEvents = [];
 let currentSort = 'volume24hr';
@@ -675,6 +640,8 @@ let countdown = REFRESH_INTERVAL;
 
 // Cache for price history data
 const priceCache = new Map();
+// Manifest of available chart files
+let chartsManifest = {};
 
 // ─── Helpers ───
 function formatUSD(n) {
@@ -714,19 +681,54 @@ function getOutcomeColor(i) { return OUTCOME_COLORS[i % OUTCOME_COLORS.length]; 
 
 // ─── Fetch ───
 async function fetchMarkets() {
-  const url = `${GAMMA}/events?active=true&closed=false&order=volume24hr&ascending=false&limit=30`;
-  const r = await proxyFetch(url);
+  // Load static JSON (updated by GitHub Actions every 5 min)
+  const r = await fetch(`${DATA_BASE}/events.json?t=${Date.now()}`);
+  if (!r.ok) throw new Error(`Failed to load events data (${r.status})`);
   return r.json();
 }
 
-async function fetchPriceHistory(tokenId, interval = 'max', fidelity = 60) {
-  const key = `${tokenId}_${interval}_${fidelity}`;
-  if (priceCache.has(key)) return priceCache.get(key);
+async function fetchMeta() {
   try {
-    const url = `${CLOB}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`;
-    const r = await proxyFetch(url);
+    const r = await fetch(`${DATA_BASE}/meta.json?t=${Date.now()}`);
+    if (r.ok) return r.json();
+  } catch {}
+  return null;
+}
+
+async function loadChartsManifest() {
+  try {
+    const r = await fetch(`${DATA_BASE}/charts_manifest.json?t=${Date.now()}`);
+    if (r.ok) chartsManifest = await r.json();
+  } catch {}
+}
+
+async function fetchPriceHistory(tokenId, interval = 'max', fidelity = 60) {
+  // For static data, we only have the 'max' interval pre-fetched
+  const prefix = tokenId.substring(0, 20);
+  const key = `${prefix}_${interval}`;
+  if (priceCache.has(key)) return priceCache.get(key);
+
+  // Check if chart file exists in manifest
+  if (!chartsManifest[prefix] && interval === 'max') {
+    return [];
+  }
+
+  try {
+    const r = await fetch(`${DATA_BASE}/charts/${prefix}.json?t=${Date.now()}`);
+    if (!r.ok) return [];
     const d = await r.json();
-    const history = d.history || [];
+    let history = d.history || [];
+
+    // Apply interval filter client-side
+    if (interval !== 'max' && history.length > 0) {
+      const now = history[history.length - 1].t;
+      const intervals = { '1d': 86400, '1w': 604800, '1m': 2592000, '3m': 7776000 };
+      const cutoff = now - (intervals[interval] || 0);
+      if (intervals[interval]) {
+        history = history.filter(h => h.t >= cutoff);
+      }
+    }
+
     priceCache.set(key, history);
     return history;
   } catch { return []; }
@@ -1294,9 +1296,20 @@ async function loadData() {
         <div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Fetching market data...</div></div>
         <div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>`;
     }
+    await loadChartsManifest();
     allEvents = await fetchMarkets();
     renderAll();
-    document.getElementById('lastUpdated').textContent = timeNow();
+
+    // Show data freshness from meta
+    const meta = await fetchMeta();
+    if (meta && meta.updated) {
+      const updated = new Date(meta.updated);
+      const ago = Math.round((Date.now() - updated.getTime()) / 60000);
+      document.getElementById('lastUpdated').textContent =
+        ago < 1 ? 'Just now' : ago + 'm ago';
+    } else {
+      document.getElementById('lastUpdated').textContent = timeNow();
+    }
   } catch (err) {
     console.error('Fetch error:', err);
     if (allEvents.length === 0) showError(err.message);
