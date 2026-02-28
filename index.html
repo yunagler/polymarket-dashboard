@@ -631,6 +631,42 @@ const GAMMA = 'https://gamma-api.polymarket.com';
 const CLOB = 'https://clob.polymarket.com';
 const REFRESH_INTERVAL = 30;
 
+// Smart proxy: detect if we're on Vercel (has /api/proxy) or need a fallback
+const IS_VERCEL = location.hostname.includes('vercel.app') || location.pathname.startsWith('/api');
+const PROXY_BASE = '/api/proxy?url=';
+const CORSPROXY = 'https://corsproxy.io/?url=';
+
+// Proxy-aware fetch: try direct first, then Vercel proxy, then corsproxy
+async function proxyFetch(url) {
+  // 1. Try direct fetch (works if CORS is enabled or same-origin)
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) return r;
+  } catch {}
+
+  // 2. Try our own Vercel proxy
+  if (IS_VERCEL) {
+    try {
+      const r = await fetch(PROXY_BASE + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+      if (r.ok) return r;
+    } catch {}
+  }
+
+  // 3. Try corsproxy.io (works from browser, blocks server-side)
+  try {
+    const r = await fetch(CORSPROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+    if (r.ok) return r;
+  } catch {}
+
+  // 4. Last resort: try with /api/proxy even if not detected as Vercel
+  try {
+    const r = await fetch(PROXY_BASE + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+    if (r.ok) return r;
+  } catch {}
+
+  throw new Error('All fetch methods failed for: ' + url.substring(0, 60));
+}
+
 let allEvents = [];
 let currentSort = 'volume24hr';
 let searchQuery = '';
@@ -679,8 +715,7 @@ function getOutcomeColor(i) { return OUTCOME_COLORS[i % OUTCOME_COLORS.length]; 
 // ─── Fetch ───
 async function fetchMarkets() {
   const url = `${GAMMA}/events?active=true&closed=false&order=volume24hr&ascending=false&limit=30`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`API ${r.status}`);
+  const r = await proxyFetch(url);
   return r.json();
 }
 
@@ -688,8 +723,8 @@ async function fetchPriceHistory(tokenId, interval = 'max', fidelity = 60) {
   const key = `${tokenId}_${interval}_${fidelity}`;
   if (priceCache.has(key)) return priceCache.get(key);
   try {
-    const r = await fetch(`${CLOB}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`);
-    if (!r.ok) return [];
+    const url = `${CLOB}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`;
+    const r = await proxyFetch(url);
     const d = await r.json();
     const history = d.history || [];
     priceCache.set(key, history);
