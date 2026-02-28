@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Polymarket - דשבורד שווקי ניבוי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -31,9 +31,9 @@
   --red-mid: rgba(255,82,82,0.25);
   --yellow: #FFD740;
   --yellow-dim: rgba(255,215,64,0.12);
-  --font-mono: 'DM Mono', 'Courier New', monospace;
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-sans: 'DM Sans', -apple-system, sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+  --font-serif: 'Playfair Display', 'Rubik', Georgia, serif;
+  --font-sans: 'Heebo', 'Rubik', -apple-system, sans-serif;
   --radius: 12px;
   --radius-sm: 8px;
 }
@@ -117,12 +117,12 @@ body::after {
 }
 
 .header h1 {
-  font-family: var(--font-serif);
+  font-family: 'Rubik', var(--font-sans);
   font-size: 2.4rem;
-  font-weight: 400;
+  font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.1;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  line-height: 1.15;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -348,7 +348,8 @@ body::after {
 .modal-header-text { flex: 1; }
 
 .modal-title {
-  font-size: 1.1rem; font-weight: 600; line-height: 1.3; color: var(--text-primary);
+  font-family: 'Rubik', var(--font-sans);
+  font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: var(--text-primary);
 }
 
 .modal-subtitle {
@@ -522,7 +523,7 @@ body::after {
 /* ═══ ERROR ═══ */
 .error-state { max-width: 1600px; margin: 0 auto; padding: 4rem 2.5rem; text-align: center; }
 .error-icon { font-size: 2rem; margin-bottom: 1rem; opacity: 0.5; }
-.error-title { font-family: var(--font-serif); font-size: 1.3rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+.error-title { font-family: 'Rubik', var(--font-sans); font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
 .error-msg { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
 .retry-btn {
@@ -905,7 +906,7 @@ function drawFullChart(canvas, history) {
     // Price label
     const price = max - (i / gridSteps) * range;
     ctx.fillStyle = '#4A5568';
-    ctx.font = '10px "DM Mono", monospace';
+    ctx.font = '10px "Space Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText((price * 100).toFixed(1) + '%', padL - 8, y + 4);
   }
@@ -914,7 +915,7 @@ function drawFullChart(canvas, history) {
   // Date labels
   const dateSteps = Math.min(6, history.length);
   ctx.fillStyle = '#4A5568';
-  ctx.font = '10px "DM Mono", monospace';
+  ctx.font = '10px "Space Mono", monospace';
   ctx.textAlign = 'center';
   for (let i = 0; i <= dateSteps; i++) {
     const idx = Math.round((i / dateSteps) * (history.length - 1));
@@ -1083,7 +1084,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
   canvas.height = canvas.clientHeight * dpr;
   ctx.scale(dpr, dpr);
   ctx.fillStyle = '#4A5568';
-  ctx.font = '13px "DM Mono", monospace';
+  ctx.font = '13px "Space Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('...טוען נתוני גרף', canvas.clientWidth / 2, canvas.clientHeight / 2);
 
@@ -1092,7 +1093,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
   if (history.length < 2) {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     ctx.fillStyle = '#4A5568';
-    ctx.font = '13px "DM Mono", monospace';
+    ctx.font = '13px "Space Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('אין היסטוריית מחירים לטווח זמן זה', canvas.clientWidth / 2, canvas.clientHeight / 2);
     infoEl.innerHTML = '';
