@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Polymarket - דשבורד שווקי ניבוי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -31,14 +31,14 @@
   --red-mid: rgba(255,82,82,0.25);
   --yellow: #FFD740;
   --yellow-dim: rgba(255,215,64,0.12);
-  --font-mono: 'Space Mono', 'Courier New', monospace;
-  --font-serif: 'Playfair Display', 'Rubik', Georgia, serif;
-  --font-sans: 'Heebo', 'Rubik', -apple-system, sans-serif;
+  --font-mono: 'Heebo', sans-serif;
+  --font-serif: 'Heebo', sans-serif;
+  --font-sans: 'Heebo', sans-serif;
   --radius: 12px;
   --radius-sm: 8px;
 }
 
-html { font-size: 15px; }
+html { font-size: 16px; }
 
 body {
   background: var(--bg-deep);
@@ -93,10 +93,10 @@ body::after {
 .header-left { flex: 1; min-width: 300px; }
 
 .header-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
   color: var(--accent-cyan);
   margin-bottom: 0.5rem;
   display: flex;
@@ -117,23 +117,21 @@ body::after {
 }
 
 .header h1 {
-  font-family: 'Rubik', var(--font-sans);
-  font-size: 2.4rem;
+  font-family: var(--font-sans);
+  font-size: 2rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: 0;
+  line-height: 1.2;
+  color: var(--text-primary);
 }
 
-.header-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem; font-weight: 300; }
+.header-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.3rem; font-weight: 400; }
 
 .header-right { display: flex; align-items: center; gap: 1.5rem; flex-shrink: 0; }
 
 .refresh-indicator {
   display: flex; align-items: center; gap: 0.6rem;
-  font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);
+  font-size: 0.8rem; font-weight: 500; color: var(--text-muted);
 }
 
 .refresh-ring { width: 28px; height: 28px; }
@@ -146,7 +144,7 @@ body::after {
 }
 
 .last-updated {
-  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);
+  font-size: 0.8rem; font-weight: 500; color: var(--text-muted);
   padding: 0.4rem 0.7rem; border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm); background: var(--bg-card);
 }
@@ -165,11 +163,10 @@ body::after {
 .stat-item:last-child { border-right: none; padding-right: 0; }
 
 .stat-label {
-  font-family: var(--font-mono); font-size: 0.65rem;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+  font-size: 0.78rem; font-weight: 500; color: var(--text-muted);
 }
 
-.stat-value { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 500; color: var(--text-primary); }
+.stat-value { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
 .stat-value.accent { color: var(--accent-cyan); }
 
 /* ═══ CONTROLS ═══ */
@@ -181,10 +178,10 @@ body::after {
 .search-box { flex: 1; min-width: 250px; max-width: 400px; position: relative; }
 
 .search-box input {
-  width: 100%; padding: 0.6rem 1rem 0.6rem 2.4rem;
+  width: 100%; padding: 0.6rem 2.4rem 0.6rem 1rem;
   background: var(--bg-card); border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm); color: var(--text-primary);
-  font-family: var(--font-sans); font-size: 0.82rem; outline: none;
+  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 400; outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .search-box input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px var(--accent-cyan-dim); }
@@ -203,14 +200,14 @@ body::after {
 .sort-btn {
   padding: 0.55rem 0.9rem; background: var(--bg-card); border: none;
   border-right: 1px solid var(--border-subtle); color: var(--text-muted);
-  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.03em;
+  font-family: var(--font-sans); font-size: 0.8rem; font-weight: 500;
   cursor: pointer; transition: all 0.2s; white-space: nowrap;
 }
 .sort-btn:last-child { border-right: none; }
 .sort-btn:hover { color: var(--text-secondary); background: var(--bg-elevated); }
 .sort-btn.active { color: var(--accent-cyan); background: var(--accent-cyan-dim); }
 
-.market-count { margin-left: auto; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+.market-count { margin-left: auto; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
 
 /* ═══ GRID ═══ */
 .markets-grid {
@@ -248,7 +245,7 @@ body::after {
 }
 
 .card-title {
-  font-size: 0.85rem; font-weight: 500; line-height: 1.35; color: var(--text-primary);
+  font-size: 0.9rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden; flex: 1;
 }
@@ -259,12 +256,12 @@ body::after {
 .prob-labels { display: flex; justify-content: space-between; margin-bottom: 0.35rem; }
 
 .prob-label {
-  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+  font-size: 0.82rem; font-weight: 600;
   display: flex; align-items: center; gap: 0.3rem;
 }
 .prob-label.yes { color: var(--green); }
 .prob-label.no { color: var(--red); }
-.prob-label .pct { font-size: 0.95rem; font-weight: 500; }
+.prob-label .pct { font-size: 1rem; font-weight: 700; }
 
 .prob-bar {
   height: 6px; border-radius: 3px; overflow: hidden;
@@ -293,7 +290,7 @@ body::after {
 
 .chart-expand-hint {
   position: absolute; top: 4px; right: 1rem;
-  font-family: var(--font-mono); font-size: 0.58rem;
+  font-size: 0.7rem;
   color: var(--accent-cyan); opacity: 0; transition: opacity 0.2s;
   background: var(--bg-card); padding: 0 4px; border-radius: 3px;
 }
@@ -304,12 +301,12 @@ body::after {
 
 .chart-loading {
   height: 50px; display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+  font-size: 0.8rem; color: var(--text-muted);
 }
 
 .chart-timerange {
   display: flex; justify-content: space-between; margin-top: 0.2rem;
-  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  font-size: 0.7rem; color: var(--text-muted);
 }
 
 /* ═══ MODAL CHART ═══ */
@@ -348,12 +345,11 @@ body::after {
 .modal-header-text { flex: 1; }
 
 .modal-title {
-  font-family: 'Rubik', var(--font-sans);
-  font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: var(--text-primary);
+  font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: var(--text-primary);
 }
 
 .modal-subtitle {
-  font-family: var(--font-mono); font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-secondary); margin-top: 0.2rem;
 }
 
@@ -376,7 +372,7 @@ body::after {
 .tf-btn {
   padding: 0.45rem 1rem; background: var(--bg-card); border: none;
   border-right: 1px solid var(--border-subtle); color: var(--text-muted);
-  font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
+  font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
 }
 .tf-btn:last-child { border-right: none; }
 .tf-btn:hover { color: var(--text-secondary); }
@@ -399,12 +395,12 @@ body::after {
 }
 
 .modal-info-label {
-  font-family: var(--font-mono); font-size: 0.6rem;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
 }
 
 .modal-info-value {
-  font-family: var(--font-mono); font-size: 0.9rem; font-weight: 500;
+  font-size: 0.95rem; font-weight: 600;
 }
 
 .modal-info-value.up { color: var(--green); }
@@ -415,13 +411,13 @@ body::after {
 .chart-tooltip {
   position: absolute; background: var(--bg-elevated); border: 1px solid var(--border-hover);
   border-radius: 6px; padding: 0.4rem 0.6rem; pointer-events: none;
-  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-primary);
+  font-size: 0.8rem; color: var(--text-primary);
   white-space: nowrap; z-index: 10; display: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.chart-tooltip .tt-price { font-size: 0.85rem; font-weight: 500; color: var(--accent-cyan); }
-.chart-tooltip .tt-date { font-size: 0.6rem; color: var(--text-muted); margin-top: 2px; }
+.chart-tooltip .tt-price { font-size: 0.9rem; font-weight: 600; color: var(--accent-cyan); }
+.chart-tooltip .tt-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
 .chart-crosshair {
   position: absolute; top: 0; width: 1px; height: 100%;
@@ -447,18 +443,17 @@ body::after {
 .metric:last-child { border-right: none; }
 
 .metric-label {
-  font-family: var(--font-mono); font-size: 0.58rem;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 0.8rem; font-weight: 500;
   color: var(--text-muted); margin-bottom: 0.15rem;
 }
 
-.metric-value { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); }
+.metric-value { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
 
 .card-link-arrow {
   position: absolute; top: 1rem; right: 0.8rem;
   width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
   border-radius: 4px; background: transparent; color: var(--text-muted);
-  font-size: 0.7rem; transition: all 0.2s; opacity: 0;
+  font-size: 0.8rem; transition: all 0.2s; opacity: 0;
 }
 .market-card:hover .card-link-arrow { opacity: 1; background: var(--accent-cyan-dim); color: var(--accent-cyan); }
 
@@ -468,7 +463,7 @@ body::after {
 .outcome-row { display: flex; align-items: center; gap: 0.5rem; }
 
 .outcome-name {
-  font-size: 0.72rem; color: var(--text-secondary); flex: 1;
+  font-size: 0.8rem; font-weight: 400; color: var(--text-secondary); flex: 1;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
 }
 
@@ -480,8 +475,8 @@ body::after {
 .outcome-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
 
 .outcome-pct {
-  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
-  min-width: 38px; text-align: right;
+  font-size: 0.82rem; font-weight: 700;
+  min-width: 42px; text-align: right;
 }
 
 /* ═══ LOADING ═══ */
@@ -498,7 +493,7 @@ body::after {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.loading-text { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+.loading-text { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
 
 .skeleton-grid {
   max-width: 1600px; margin: 0 auto; padding: 1.2rem 2.5rem;
@@ -523,20 +518,20 @@ body::after {
 /* ═══ ERROR ═══ */
 .error-state { max-width: 1600px; margin: 0 auto; padding: 4rem 2.5rem; text-align: center; }
 .error-icon { font-size: 2rem; margin-bottom: 1rem; opacity: 0.5; }
-.error-title { font-family: 'Rubik', var(--font-sans); font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
+.error-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
 .error-msg { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
 .retry-btn {
   padding: 0.6rem 1.5rem; background: var(--accent-cyan-dim);
   border: 1px solid var(--accent-cyan); border-radius: var(--radius-sm);
-  color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem;
+  color: var(--accent-cyan); font-size: 0.85rem;
   cursor: pointer; transition: all 0.2s;
 }
 .retry-btn:hover { background: var(--accent-cyan-glow); box-shadow: 0 0 16px var(--accent-cyan-dim); }
 
 .empty-state {
   grid-column: 1 / -1; text-align: center; padding: 3rem;
-  color: var(--text-muted); font-family: var(--font-mono); font-size: 0.85rem;
+  color: var(--text-muted); font-size: 0.9rem;
 }
 
 /* ═══ RESPONSIVE ═══ */
@@ -906,7 +901,7 @@ function drawFullChart(canvas, history) {
     // Price label
     const price = max - (i / gridSteps) * range;
     ctx.fillStyle = '#4A5568';
-    ctx.font = '10px "Space Mono", monospace';
+    ctx.font = '11px "Heebo", sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText((price * 100).toFixed(1) + '%', padL - 8, y + 4);
   }
@@ -915,7 +910,7 @@ function drawFullChart(canvas, history) {
   // Date labels
   const dateSteps = Math.min(6, history.length);
   ctx.fillStyle = '#4A5568';
-  ctx.font = '10px "Space Mono", monospace';
+  ctx.font = '11px "Heebo", sans-serif';
   ctx.textAlign = 'center';
   for (let i = 0; i <= dateSteps; i++) {
     const idx = Math.round((i / dateSteps) * (history.length - 1));
@@ -1084,7 +1079,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
   canvas.height = canvas.clientHeight * dpr;
   ctx.scale(dpr, dpr);
   ctx.fillStyle = '#4A5568';
-  ctx.font = '13px "Space Mono", monospace';
+  ctx.font = '14px "Heebo", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('...טוען נתוני גרף', canvas.clientWidth / 2, canvas.clientHeight / 2);
 
@@ -1093,7 +1088,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
   if (history.length < 2) {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     ctx.fillStyle = '#4A5568';
-    ctx.font = '13px "Space Mono", monospace';
+    ctx.font = '14px "Heebo", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('אין היסטוריית מחירים לטווח זמן זה', canvas.clientWidth / 2, canvas.clientHeight / 2);
     infoEl.innerHTML = '';
