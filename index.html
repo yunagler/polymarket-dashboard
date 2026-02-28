@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Polymarket Live Dashboard</title>
+<title>Polymarket - דשבורד שווקי ניבוי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -561,6 +561,34 @@ body::after {
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ═══ RTL OVERRIDES ═══ */
+.stat-item { border-right: none; border-left: 1px solid var(--border-subtle); }
+.stat-item:first-child { padding-right: 0; }
+.stat-item:last-child { border-left: none; padding-left: 0; }
+
+.search-box .search-icon { left: auto; right: 0.8rem; }
+.search-box input { padding: 0.6rem 2.4rem 0.6rem 1rem; }
+
+.sort-btn { border-right: none; border-left: 1px solid var(--border-subtle); }
+.sort-btn:last-child { border-left: none; }
+
+.market-count { margin-left: 0; margin-right: auto; }
+
+.metric { border-right: none; border-left: 1px solid var(--border-subtle); }
+.metric:last-child { border-left: none; }
+
+.card-link-arrow { right: auto; left: 0.8rem; }
+
+.outcome-pct { text-align: left; }
+
+.chart-expand-hint { right: auto; left: 1rem; }
+
+.prob-bar-yes { direction: ltr; }
+
+@media (max-width: 700px) {
+  .stat-item { border-left: none; }
+}
 </style>
 </head>
 <body>
@@ -569,9 +597,9 @@ body::after {
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <div class="header-eyebrow"><span class="pulse"></span><span>Live Data Feed</span></div>
-        <h1>Polymarket Dashboard</h1>
-        <p class="header-subtitle">Real-time prediction market intelligence</p>
+        <div class="header-eyebrow"><span class="pulse"></span><span>נתונים בזמן אמת</span></div>
+        <h1>דשבורד Polymarket</h1>
+        <p class="header-subtitle">מודיעין שווקי ניבוי בזמן אמת</p>
       </div>
       <div class="header-right">
         <div class="refresh-indicator">
@@ -589,23 +617,23 @@ body::after {
   </header>
 
   <div class="stats-bar">
-    <div class="stat-item"><span class="stat-label">Markets</span><span class="stat-value accent" id="statMarkets">&mdash;</span></div>
-    <div class="stat-item"><span class="stat-label">24h Volume</span><span class="stat-value" id="statVolume24h">&mdash;</span></div>
-    <div class="stat-item"><span class="stat-label">Total Volume</span><span class="stat-value" id="statTotalVolume">&mdash;</span></div>
-    <div class="stat-item"><span class="stat-label">Avg Spread</span><span class="stat-value" id="statSpread">&mdash;</span></div>
+    <div class="stat-item"><span class="stat-label">שווקים</span><span class="stat-value accent" id="statMarkets">&mdash;</span></div>
+    <div class="stat-item"><span class="stat-label">מחזור 24 שע'</span><span class="stat-value" id="statVolume24h">&mdash;</span></div>
+    <div class="stat-item"><span class="stat-label">מחזור כולל</span><span class="stat-value" id="statTotalVolume">&mdash;</span></div>
+    <div class="stat-item"><span class="stat-label">מרווח ממוצע</span><span class="stat-value" id="statSpread">&mdash;</span></div>
   </div>
 
   <div class="controls">
     <div class="search-box">
       <span class="search-icon">&#x1F50D;</span>
-      <input type="text" id="searchInput" placeholder="Search markets..." />
+      <input type="text" id="searchInput" placeholder="חיפוש שווקים..." />
     </div>
     <div class="sort-group">
-      <button class="sort-btn active" data-sort="volume24hr">24h Vol</button>
-      <button class="sort-btn" data-sort="volume">Total Vol</button>
-      <button class="sort-btn" data-sort="liquidity">Liquidity</button>
-      <button class="sort-btn" data-sort="yesHigh">Highest Yes%</button>
-      <button class="sort-btn" data-sort="yesLow">Lowest Yes%</button>
+      <button class="sort-btn active" data-sort="volume24hr">מחזור 24שע'</button>
+      <button class="sort-btn" data-sort="volume">מחזור כולל</button>
+      <button class="sort-btn" data-sort="liquidity">נזילות</button>
+      <button class="sort-btn" data-sort="yesHigh">כן% גבוה</button>
+      <button class="sort-btn" data-sort="yesLow">כן% נמוך</button>
     </div>
     <span class="market-count" id="marketCount"></span>
   </div>
@@ -613,7 +641,7 @@ body::after {
   <div id="content">
     <div class="loading-state">
       <div class="loading-spinner"></div>
-      <div class="loading-text">Fetching market data...</div>
+      <div class="loading-text">טוען נתוני שוק...</div>
     </div>
     <div class="skeleton-grid">
       <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
@@ -667,13 +695,13 @@ function escHtml(s) {
 
 function formatDate(ts) {
   const d = new Date(ts * 1000);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return d.toLocaleDateString('he-IL', { month: 'short', day: 'numeric' });
 }
 
 function formatDateTime(ts) {
   const d = new Date(ts * 1000);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return d.toLocaleDateString('he-IL', { month: 'short', day: 'numeric', year: 'numeric' })
+    + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 const OUTCOME_COLORS = ['#00E676','#448AFF','#FF9100','#E040FB','#FFD740','#18FFFF','#FF5252','#69F0AE','#7C4DFF','#FF6E40'];
@@ -995,8 +1023,8 @@ function openModal(event) {
           <div class="modal-header-text">
             <div class="modal-title">${escHtml(event.title)}</div>
             <div class="modal-subtitle">
-              ${event.isMulti ? event.outcomes.length + ' outcomes' : 'Yes ' + formatPct(event.yesPrice) + ' / No ' + formatPct(event.noPrice)}
-              &bull; Vol ${formatUSD(event.volume)} &bull; 24h ${formatUSD(event.volume24hr)}
+              ${event.isMulti ? event.outcomes.length + ' תוצאות' : 'כן ' + formatPct(event.yesPrice) + ' / לא ' + formatPct(event.noPrice)}
+              &bull; מחזור ${formatUSD(event.volume)} &bull; 24שע' ${formatUSD(event.volume24hr)}
             </div>
           </div>
           <button class="modal-close" id="modalClose">&times;</button>
@@ -1057,7 +1085,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
   ctx.fillStyle = '#4A5568';
   ctx.font = '13px "DM Mono", monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('Loading chart data...', canvas.clientWidth / 2, canvas.clientHeight / 2);
+  ctx.fillText('...טוען נתוני גרף', canvas.clientWidth / 2, canvas.clientHeight / 2);
 
   const history = await fetchPriceHistory(tokenId, interval, fidelity);
 
@@ -1066,7 +1094,7 @@ async function loadModalChart(tokenId, interval, fidelity) {
     ctx.fillStyle = '#4A5568';
     ctx.font = '13px "DM Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('No price history available for this timeframe', canvas.clientWidth / 2, canvas.clientHeight / 2);
+    ctx.fillText('אין היסטוריית מחירים לטווח זמן זה', canvas.clientWidth / 2, canvas.clientHeight / 2);
     infoEl.innerHTML = '';
     return;
   }
@@ -1090,23 +1118,23 @@ async function loadModalChart(tokenId, interval, fidelity) {
 
   infoEl.innerHTML = `
     <div class="modal-info-item">
-      <span class="modal-info-label">Current</span>
+      <span class="modal-info-label">נוכחי</span>
       <span class="modal-info-value neutral">${(last * 100).toFixed(2)}%</span>
     </div>
     <div class="modal-info-item">
-      <span class="modal-info-label">Change</span>
+      <span class="modal-info-label">שינוי</span>
       <span class="modal-info-value ${cls}">${arrow} ${Math.abs(change * 100).toFixed(2)}pp (${changePct >= 0 ? '+' : ''}${changePct.toFixed(1)}%)</span>
     </div>
     <div class="modal-info-item">
-      <span class="modal-info-label">High</span>
+      <span class="modal-info-label">שיא</span>
       <span class="modal-info-value neutral">${(hi * 100).toFixed(2)}%</span>
     </div>
     <div class="modal-info-item">
-      <span class="modal-info-label">Low</span>
+      <span class="modal-info-label">שפל</span>
       <span class="modal-info-value neutral">${(lo * 100).toFixed(2)}%</span>
     </div>
     <div class="modal-info-item">
-      <span class="modal-info-label">Data Points</span>
+      <span class="modal-info-label">נקודות נתונים</span>
       <span class="modal-info-value neutral">${history.length}</span>
     </div>`;
 }
@@ -1125,13 +1153,13 @@ function renderCard(event, index) {
         <div class="outcome-bar-wrap"><div class="outcome-bar-fill" style="width:${(o.price*100).toFixed(1)}%;background:${o.color};box-shadow:0 0 6px ${o.color}33"></div></div>
         <span class="outcome-pct" style="color:${o.color}">${formatPct(o.price)}</span>
       </div>`).join('')}
-      ${event.outcomes.length > 4 ? `<div class="outcome-row"><span class="outcome-name" style="color:var(--text-muted);font-style:italic">+${event.outcomes.length - 4} more</span></div>` : ''}
+      ${event.outcomes.length > 4 ? `<div class="outcome-row"><span class="outcome-name" style="color:var(--text-muted);font-style:italic">+${event.outcomes.length - 4} תוצאות נוספות</span></div>` : ''}
     </div>`;
   } else {
     probSection = `<div class="card-probability">
       <div class="prob-labels">
-        <span class="prob-label yes">Yes <span class="pct">${formatPct(event.yesPrice)}</span></span>
-        <span class="prob-label no"><span class="pct">${formatPct(event.noPrice)}</span> No</span>
+        <span class="prob-label yes">כן <span class="pct">${formatPct(event.yesPrice)}</span></span>
+        <span class="prob-label no"><span class="pct">${formatPct(event.noPrice)}</span> לא</span>
       </div>
       <div class="prob-bar"><div class="prob-bar-yes" style="width:${(event.yesPrice*100).toFixed(1)}%"></div></div>
     </div>`;
@@ -1149,18 +1177,18 @@ function renderCard(event, index) {
     </div>
     ${probSection}
     <div class="card-chart" data-token="${event.primaryTokenId || ''}" id="${cardId}-chart">
-      <div class="chart-loading" id="${cardId}-loading">Loading chart...</div>
+      <div class="chart-loading" id="${cardId}-loading">טוען גרף...</div>
       <canvas class="sparkline-canvas" id="${cardId}-canvas" style="display:none"></canvas>
       <div class="chart-timerange" id="${cardId}-range" style="display:none">
         <span id="${cardId}-start"></span>
         <span id="${cardId}-end"></span>
       </div>
-      <span class="chart-expand-hint">Click to expand</span>
+      <span class="chart-expand-hint">לחץ להרחבה</span>
     </div>
     <div class="card-metrics">
-      <div class="metric"><div class="metric-label">24h Vol</div><div class="metric-value">${formatUSD(event.volume24hr)}</div></div>
-      <div class="metric"><div class="metric-label">Volume</div><div class="metric-value">${formatUSD(event.volume)}</div></div>
-      <div class="metric"><div class="metric-label">Liquidity</div><div class="metric-value">${formatUSD(event.liquidity)}</div></div>
+      <div class="metric"><div class="metric-label">מחזור 24שע'</div><div class="metric-value">${formatUSD(event.volume24hr)}</div></div>
+      <div class="metric"><div class="metric-label">מחזור</div><div class="metric-value">${formatUSD(event.volume)}</div></div>
+      <div class="metric"><div class="metric-label">נזילות</div><div class="metric-value">${formatUSD(event.liquidity)}</div></div>
     </div>
   </div>`;
 }
@@ -1195,10 +1223,10 @@ function renderAll() {
   document.getElementById('statTotalVolume').textContent = formatUSD(items.reduce((s, e) => s + e.volume, 0));
   const spreads = items.filter(e => !e.isMulti).map(e => Math.abs(e.yesPrice - e.noPrice));
   document.getElementById('statSpread').textContent = formatPct(spreads.length > 0 ? spreads.reduce((a,b) => a+b, 0) / spreads.length : 0);
-  document.getElementById('marketCount').textContent = `${items.length} market${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('marketCount').textContent = `${items.length} שווקים`;
 
   if (items.length === 0) {
-    contentEl.innerHTML = `<div class="markets-grid"><div class="empty-state">No markets match your search.</div></div>`;
+    contentEl.innerHTML = `<div class="markets-grid"><div class="empty-state">לא נמצאו שווקים תואמים לחיפוש.</div></div>`;
     return;
   }
 
@@ -1232,7 +1260,7 @@ async function loadSparklines(items) {
           loadSingleSparkline(cardId, tokenId);
         } else {
           const loading = document.getElementById(`${cardId}-loading`);
-          if (loading) loading.textContent = 'No chart data';
+          if (loading) loading.textContent = 'אין נתוני גרף';
         }
         observer.unobserve(chartDiv);
       }
@@ -1256,7 +1284,7 @@ async function loadSingleSparkline(cardId, tokenId) {
     if (weekHistory.length >= 2) {
       drawSparklineWithData(cardId, weekHistory);
     } else {
-      if (loading) loading.textContent = 'No chart data';
+      if (loading) loading.textContent = 'אין נתוני גרף';
     }
     return;
   }
@@ -1282,9 +1310,9 @@ function showError(msg) {
   document.getElementById('content').innerHTML = `
     <div class="error-state">
       <div class="error-icon">&#x26A0;</div>
-      <div class="error-title">Connection failed</div>
+      <div class="error-title">החיבור נכשל</div>
       <div class="error-msg">${escHtml(msg)}</div>
-      <button class="retry-btn" onclick="loadData()">Retry</button>
+      <button class="retry-btn" onclick="loadData()">נסה שוב</button>
     </div>`;
 }
 
@@ -1293,7 +1321,7 @@ async function loadData() {
   try {
     if (allEvents.length === 0) {
       document.getElementById('content').innerHTML = `
-        <div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Fetching market data...</div></div>
+        <div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">טוען נתוני שוק...</div></div>
         <div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>`;
     }
     await loadChartsManifest();
@@ -1306,7 +1334,7 @@ async function loadData() {
       const updated = new Date(meta.updated);
       const ago = Math.round((Date.now() - updated.getTime()) / 60000);
       document.getElementById('lastUpdated').textContent =
-        ago < 1 ? 'Just now' : ago + 'm ago';
+        ago < 1 ? 'עכשיו' : 'לפני ' + ago + ' דק\'';
     } else {
       document.getElementById('lastUpdated').textContent = timeNow();
     }
